@@ -8,8 +8,9 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 */
 
 #include "raylib.h"
-
-#include "resource_dir.h"	// utility header for SearchAndSetResourceDir
+#include "raymath.h"
+#include "physics.h"
+#include "stdio.h"
 
 int main ()
 {
@@ -19,34 +20,70 @@ int main ()
 	// Create the window and OpenGL context
 	InitWindow(1280, 800, "Hello Raylib");
 
-	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
-	SearchAndSetResourceDir("resources");
+	QtPool pool = {0};
 
-	// Load a texture from the resources directory
-	Texture wabbit = LoadTexture("wabbit_alpha.png");
+	int left = R;
+	int right = GetScreenWidth() - R;
+	int top = R;
+	int bottom = GetScreenHeight() - R;
+	Ball balls[NUM_PARTICLES];
+	for (int i = 0; i < NUM_PARTICLES; i++) {
+		int xVel = GetRandomValue(-100, 100);
+		int yVel = GetRandomValue(-100, 100);
+		int yPos = GetRandomValue(100, 600);
+		int xPos = GetRandomValue(left, right);
+		balls[i] = (Ball){R, {xPos, yPos}, {xVel, yVel}, {0, G}, i};
+	}
 	
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
+		float dt = GetFrameTime();
+		pool_reset(&pool);
+    	Quadtree *qt = qt_create(&pool, (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
+
 		// drawing
 		BeginDrawing();
 
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(BLACK);
 
-		// draw some text using the default font
-		DrawText("Hello Raylib", 200,200,20,WHITE);
+		// physics
+		for (int i = 0; i < NUM_PARTICLES; i++) {
+			sim_physics(&balls[i], dt);
+		}
+		double t1 = GetTime();
 
-		// draw our texture to the screen
-		DrawTexture(wabbit, 400, 200, WHITE);
-		
+		// ball collisions
+		for (int i = 0; i < NUM_PARTICLES - 1; i++) {
+			qt_insert(&pool, qt, &balls[i]);
+		}
+		double t2 = GetTime();
+
+		for (int i = 0; i < NUM_PARTICLES - 1; i++) {
+			check_collisions(qt, &balls[i]);
+		}
+
+		// boundaries
+		for (int i = 0; i < NUM_PARTICLES; i++) {
+			check_boundaries(&balls[i]);
+		}
+		double t3 = GetTime();
+
+		// drawing
+		for (int i = 0; i < NUM_PARTICLES; i++) {
+			Color color = velocity_to_color(balls[i].v);
+			DrawCircle(balls[i].p.x, balls[i].p.y, balls[i].r, color);
+		}
+
+		qt_draw(qt);
+
+		DrawText(TextFormat("insert: %.2fms", (t2-t1)*1000), 10, 30, 20, WHITE);
+		DrawText(TextFormat("collide: %.2fms", (t3-t2)*1000), 10, 50, 20, WHITE);
+
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}
-
-	// cleanup
-	// unload our texture so it can be cleaned up
-	UnloadTexture(wabbit);
 
 	// destroy the window and cleanup the OpenGL context
 	CloseWindow();
