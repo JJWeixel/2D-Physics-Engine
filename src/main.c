@@ -26,10 +26,11 @@ int main ()
 	int right = GetScreenWidth() - R;
 	int top = R;
 	int bottom = GetScreenHeight() - R;
+	int maxVel = 500;
 	Ball balls[NUM_PARTICLES];
 	for (int i = 0; i < NUM_PARTICLES; i++) {
-		int xVel = GetRandomValue(-10, 10);
-		int yVel = GetRandomValue(-10, 10);
+		int xVel = GetRandomValue(-maxVel, maxVel);
+		int yVel = GetRandomValue(-maxVel, maxVel);
 		int yPos = GetRandomValue(top, bottom);
 		int xPos = GetRandomValue(left, right);
 		balls[i] = (Ball){R, {xPos, yPos}, {xVel, yVel}, {0, G}, i};
@@ -56,12 +57,12 @@ int main ()
 		double t1 = GetTime();
 
 		// ball collisions
-		for (int i = 0; i < NUM_PARTICLES - 1; i++) {
+		for (int i = 0; i < NUM_PARTICLES; i++) {
 			qt_insert(&pool, qt, &balls[i]);
 		}
 		double t2 = GetTime();
 
-		for (int i = 0; i < NUM_PARTICLES - 1; i++) {
+		for (int i = 0; i < NUM_PARTICLES; i++) {
 			check_collisions(qt, &balls[i]);
 		}
 

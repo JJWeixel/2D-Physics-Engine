@@ -48,21 +48,21 @@ void qt_free(Quadtree *qt) {
     free(qt);
 }
 
-int qt_query(Quadtree *qt, Rectangle range, Ball **results, int max) {
-    if (!CheckCollisionRecs(qt->rect, range))
+int qt_query(Quadtree *qt, Vector2 center, float r, Ball **results, int max) {
+    if (!CheckCollisionCircleRec(center, r, qt->rect))
         return 0;
 
     int found = 0;
     for (int i = 0; i < qt->count && found < max; i++) {
-        if (CheckCollisionPointRec(qt->elements[i]->p, range))
+        if (CheckCollisionPointCircle(qt->elements[i]->p, center, r))
             results[found++] = qt->elements[i];
     }
 
     if (qt->divided) {
-        found += qt_query(qt->nw, range, results + found, max - found);
-        found += qt_query(qt->ne, range, results + found, max - found);
-        found += qt_query(qt->sw, range, results + found, max - found);
-        found += qt_query(qt->se, range, results + found, max - found);
+        found += qt_query(qt->nw, center, r, results + found, max - found);
+        found += qt_query(qt->ne, center, r, results + found, max - found);
+        found += qt_query(qt->sw, center, r, results + found, max - found);
+        found += qt_query(qt->se, center, r, results + found, max - found);
     }
 
     return found;

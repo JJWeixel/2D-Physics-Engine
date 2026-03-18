@@ -1,8 +1,8 @@
 #include "raylib.h"
 
 #define G 0
-#define R 3
-#define NUM_PARTICLES 25000
+#define R 25
+#define NUM_PARTICLES 4
 #define QT_THRESHHOLD 4
 
 typedef struct ball {
@@ -30,7 +30,7 @@ Quadtree *qt_create(QtPool *, Rectangle);
 void qt_subdivide(QtPool *, Quadtree *);
 bool qt_insert(QtPool *, Quadtree *, Ball *);
 void qt_free(Quadtree *);
-int qt_query(Quadtree *, Rectangle, Ball **, int);
+int qt_query(Quadtree *, Vector2, float, Ball **, int);
 void qt_draw(Quadtree *);
 
 void sim_physics(Ball *, float);

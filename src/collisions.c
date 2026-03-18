@@ -46,9 +46,8 @@ void handle_collision(Ball *a, Ball *b) {
 }
 
 int get_nearby(Quadtree *qt, Ball *b, Ball **nearby, int max) {
-    Rectangle search = {b->p.x - b->r * 2, b->p.y - b->r * 2, b->r * 4, b->r * 4};
     Ball *results[max];
-    int n = qt_query(qt, search, results, max);
+    int n = qt_query(qt, b->p, b->r * 2, results, max);
 
     int count = 0;
     for (int i = 0; i < n && count < max; i++) {
