@@ -70,7 +70,7 @@ int qt_query(Quadtree *qt, Rectangle range, Ball **results, int max) {
 
 void qt_draw(Quadtree *qt) {
     if (!qt) return;
-    DrawRectangleLinesEx(qt->rect, .5f, RED);
+    DrawRectangleLinesEx(qt->rect, .3f, RED);
     qt_draw(qt->nw);
     qt_draw(qt->ne);
     qt_draw(qt->sw);

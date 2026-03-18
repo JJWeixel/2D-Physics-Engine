@@ -1,7 +1,7 @@
 #include "raylib.h"
 
 #define G 0
-#define R 1
+#define R 3
 #define NUM_PARTICLES 25000
 #define QT_THRESHHOLD 4
 

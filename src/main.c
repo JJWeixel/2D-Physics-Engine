@@ -28,9 +28,9 @@ int main ()
 	int bottom = GetScreenHeight() - R;
 	Ball balls[NUM_PARTICLES];
 	for (int i = 0; i < NUM_PARTICLES; i++) {
-		int xVel = GetRandomValue(-100, 100);
-		int yVel = GetRandomValue(-100, 100);
-		int yPos = GetRandomValue(100, 600);
+		int xVel = GetRandomValue(-10, 10);
+		int yVel = GetRandomValue(-10, 10);
+		int yPos = GetRandomValue(top, bottom);
 		int xPos = GetRandomValue(left, right);
 		balls[i] = (Ball){R, {xPos, yPos}, {xVel, yVel}, {0, G}, i};
 	}
@@ -38,6 +38,7 @@ int main ()
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
+		double t0 = GetTime();
 		float dt = GetFrameTime();
 		pool_reset(&pool);
     	Quadtree *qt = qt_create(&pool, (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
@@ -73,13 +74,16 @@ int main ()
 		// drawing
 		for (int i = 0; i < NUM_PARTICLES; i++) {
 			Color color = velocity_to_color(balls[i].v);
-			DrawCircle(balls[i].p.x, balls[i].p.y, balls[i].r, color);
+			DrawPoly(balls[i].p, 8, balls[i].r, 0, color);
 		}
 
 		qt_draw(qt);
 
+		double t4 = GetTime();
+
 		DrawText(TextFormat("insert: %.2fms", (t2-t1)*1000), 10, 30, 20, WHITE);
 		DrawText(TextFormat("collide: %.2fms", (t3-t2)*1000), 10, 50, 20, WHITE);
+		DrawText(TextFormat("total time: %.2fms", (t4-t0)*1000), 10, 70, 20, WHITE);
 
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
